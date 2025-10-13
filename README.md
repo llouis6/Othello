@@ -5,7 +5,7 @@ A Python framework for developing and testing AI agents in the classic board gam
 > **Project Structure:** Inspired by David Meger's original work, enhanced for competitive AI development and a programming tournament.
 
 ## Report
-[Othello AI Report (PDF)](othello_report.pdf)
+[Othello AI Report (PDF)](Othello_report.pdf)
 
 ## Quick Start
 
