@@ -2,7 +2,10 @@
 
 A Python framework for developing and testing AI agents in the classic board game Reversi/Othello. This project implements the complete game logic with an extensible agent system, allowing developers to create and test their own AI strategies.
 
-> **Project Structure:** Inspired by David Meger's original work, enhanced for competitive AI development and a programming tournament. 
+> **Project Structure:** Inspired by David Meger's original work, enhanced for competitive AI development and a programming tournament.
+
+## Report
+[Othello AI Report (PDF)](docs/othello_report.pdf)
 
 ## Quick Start
 
