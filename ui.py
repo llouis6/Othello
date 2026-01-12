@@ -170,18 +170,63 @@ class OthelloWidget(QWidget):
             footer_y = self.height() - 50
             painter.drawText(20, footer_y, score_text)
             
-            # Win message
+            # Draw prominent winner message in center of screen only when game is over
             if self.world.results_cache[0]:
-                if self.world.results_cache[1] > self.world.results_cache[2]:
-                    win_text = "Blue wins!"
-                elif self.world.results_cache[1] < self.world.results_cache[2]:
-                    win_text = "Brown wins!"
-                else:
-                    win_text = "It is a Tie!"
-                
-                painter.setFont(QFont("Arial", 16, QFont.Bold))
-                painter.setPen(QPen(QColor(100, 255, 100)))
-                painter.drawText(20, footer_y + 25, win_text)
+                self._draw_winner_overlay(painter)
+    
+    def _draw_winner_overlay(self, painter):
+        """Draw a prominent winner message overlay"""
+        # Determine winner
+        blue_score = self.world.results_cache[1]
+        brown_score = self.world.results_cache[2]
+        
+        if blue_score > brown_score:
+            winner_text = "BLUE WINS!"
+            winner_color = self.color_map[PLAYER_1_COLOR]
+            winner_name = self.world.p0
+        elif brown_score > blue_score:
+            winner_text = "BROWN WINS!"
+            winner_color = self.color_map[PLAYER_2_COLOR]
+            winner_name = self.world.p1
+        else:
+            winner_text = "TIE GAME!"
+            winner_color = QColor(150, 150, 150)
+            winner_name = None
+        
+        # Calculate center position
+        center_x = self.width() / 2
+        center_y = self.height() / 2
+        
+        # Draw semi-transparent overlay background
+        overlay_width = 400
+        overlay_height = 180
+        overlay_x = center_x - overlay_width / 2
+        overlay_y = center_y - overlay_height / 2
+        
+        # Background panel with shadow effect
+        painter.setBrush(QBrush(QColor(20, 25, 30, 240)))
+        painter.setPen(QPen(winner_color, 4))
+        painter.drawRoundedRect(overlay_x, overlay_y, overlay_width, overlay_height, 15, 15)
+        
+        # Draw winner text
+        painter.setFont(QFont("Arial", 36, QFont.Bold))
+        painter.setPen(QPen(winner_color))
+        text_rect = QRectF(overlay_x, overlay_y + 30, overlay_width, 50)
+        painter.drawText(text_rect, Qt.AlignCenter, winner_text)
+        
+        # Draw winner name if not a tie
+        if winner_name:
+            painter.setFont(QFont("Arial", 18))
+            painter.setPen(QPen(QColor(220, 220, 220)))
+            name_rect = QRectF(overlay_x, overlay_y + 85, overlay_width, 30)
+            painter.drawText(name_rect, Qt.AlignCenter, str(winner_name))
+        
+        # Draw final scores
+        painter.setFont(QFont("Arial", 16))
+        painter.setPen(QPen(QColor(200, 200, 200)))
+        score_text = f"{blue_score} - {brown_score}"
+        score_rect = QRectF(overlay_x, overlay_y + 120, overlay_width, 30)
+        painter.drawText(score_rect, Qt.AlignCenter, score_text)
 
 
 class UIEngine:
@@ -212,6 +257,11 @@ class UIEngine:
         
         # Process Qt events (equivalent to plt.pause)
         self.app.processEvents()
+        
+        # If game is over, process events again to ensure overlay is displayed
+        if len(self.world.results_cache) > 0 and self.world.results_cache[0]:
+            self.widget.repaint()  # Force immediate repaint
+            self.app.processEvents()
         
         # Handle frame saving
         if self.world.display_save:
